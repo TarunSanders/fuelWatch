@@ -2,7 +2,7 @@
 #r = requests.get('https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS')
 import feedparser
 from pprint import pprint 
-
+#
 def get_fuel(suburbAndSurrounding,day): #gets list of dictionaries with fuel info and returns this data structure
 	product_id = 1; #1: unleaded
 	url = 'https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS?Product={prod}&Suburb={sub}&Day={D}' # product = ? query strings
