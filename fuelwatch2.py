@@ -15,13 +15,14 @@ def by_price(x): # function handle for sort mutable method or sorted non-mutable
 	return x['price']
 
 def createfuelHTMLTABLE(data): # creates fuel table with columns Price, Location, Brand, Address
-	header = '<thead> <tr> <th> Price </th> <th> Location </th> <th> Brand </th> <th> Address </th></tr> </thead>' #heading format for html tables
+	header = '<thead> <tr> <th> Price (Cents) </th> <th> Location </th> <th> Brand </th> <th> Address </th> <th> Date (Y-M-D) </th></tr> </thead>' #heading format for html tables
 	
 	body = ''
 	
 	# loop creating body of table by iterating over each dictionary in list info grabbed f
 	for entry in data:
-		body = body + '<tr> <td> {pr} </td> <td> {loc} </td> <td>{br}</td> <td>{addr}</td> </tr>'.format(loc = entry['location'], br = entry['brand'], pr = entry['price'],addr = entry['address'])
+		#if entry['updated']
+		body = body + '<tr> <td> {pr} </td> <td> {loc} </td> <td>{br}</td> <td>{addr}</td> <td>{dt}</td> </tr>'.format(loc = entry['location'], br = entry['brand'], pr = entry['price'],addr = entry['address'],dt = entry['updated'])
 	body = '<tbody>'+body+'</tbody>'
 	
 	tableF = '<table>' + header + body + '</table>'
@@ -39,19 +40,22 @@ def main():
 	fuelInfoToday = get_fuel(Suburb,Days[0])  #list of dictionaries with fuel info for today
 	fuelInfoTomorrow = get_fuel(Suburb,Days[1]) #list of dictionaries with fuel info for tomorrow
 	
-	#pprint(fuelInfoToday,indent=4)
+	fuelInfo = fuelInfoToday + fuelInfoTomorrow 
 	
-	fuelInfoToday.sort(key = by_price) #other option is to: fuelInfo = sorted(fuelInfo, key = by_price)
-	fuelInfoTomorrow.sort(key = by_price) 
+
+	
+	#fuelInfoToday.sort(key = by_price) #other option is to: fuelInfo = sorted(fuelInfo, key = by_price)
+	#fuelInfoTomorrow.sort(key = by_price) 
+	fuelInfo.sort(key = by_price)
 	#pprint(fuelInfo,indent=4)
 	
 	#creates html table string format for info today/tomorrow
-	fuelTableToday = createfuelHTMLTABLE(fuelInfoToday) 
-	fuelTableTomorrow = createfuelHTMLTABLE(fuelInfoTomorrow)
-	
+	#fuelTableToday = createfuelHTMLTABLE(fuelInfoToday) 
+	#fuelTableTomorrow = createfuelHTMLTABLE(fuelInfoTomorrow)
+	fuelTable = createfuelHTMLTABLE(fuelInfo)
 	#writing full html string with fuel info to html file
-	writeTable(fuelTableToday,'fuelToday.html')
-	writeTable(fuelTableTomorrow,'fuelTomorrow.html')
-
+	writeTable(fuelTable,'fuelTodayandTomorrow.html')
+	#writeTable(fuelTableTomorrow,'fuelTomorrow.html')
+	#feedparser.parse(url)
 main() #executing main function nested with other defined functions
 
