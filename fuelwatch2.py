@@ -15,7 +15,7 @@ def get_fuel(suburbAndSurrounding,day): #gets list of dictionaries with fuel inf
 def by_price(x): # function handle for sort mutable method or sorted non-mutable function to sort prices in list of dictionaries x
 	return x['price']
 
-def createfuelHTMLTABLE(data): # creates fuel table with columns Price, Location, Brand, Address, date [
+def createfuelHTMLTABLE(data): # creates fuel table with columns Price, Location, Brand, Address, date and highlights tomorrow's price
 	header = '<thead> <tr> <th> Price (Cents) </th> <th> Location </th> <th> Brand </th> <th> Address </th> <th> Date (Y-M-D) </th></tr> </thead>' #heading format for html tables
 	
 	body = ''
