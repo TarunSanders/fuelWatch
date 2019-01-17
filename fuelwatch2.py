@@ -45,23 +45,23 @@ def createfuelHTMLTABLE(data): # creates fuel table with columns Price, Location
 					'''
 						<tbody>
 							<tr bgcolor = {col}> 
-								<td> {pr} </td> 
-								<td> {loc} </td> 
-								<td> {br} </td> 
-								<td> {addr} </td> 
-								<td> {dt} </td> 
+								<td> {price} </td> 
+								<td> {location} </td> 
+								<td> {brand} </td> 
+								<td> {address} </td> 
+								<td> {date} </td> 
 							</tr>
 						</tbody>
-			'''.format(loc = entry['location'], br = entry['brand'], pr = entry['price'],addr = entry['address'],dt = entry['date'], col = blue if entry['day'] == 'tomorrow' else white )
+			'''.format(**entry,col = blue if entry['day'] == 'tomorrow' else white) #unpacking dictionary entry in data
 			for entry in data
 	)
-	
+	argsT = [header, body]
 	tableF = '''
 			<table>
-				{h}
-				{b}
+				{}
+				{}
 			</table>
-			'''.format(h=header,b=body)
+			'''.format(*argsT) #unpacking list argsT
 	return tableF
 
 def writeTable(tableDat,fileName,): #writing function for table
@@ -78,7 +78,7 @@ def main():
 	
 	fuelInfo = fuelInfoToday + fuelInfoTomorrow 
 	
-	pprint(fuelInfo)
+	#pprint(fuelInfo)
 	
 	#fuelInfoTomorrow.sort(key = by_price) 
 	fuelInfo.sort(key = by_price) #other option is to: fuelInfo = sorted(fuelInfo, key = by_price)
