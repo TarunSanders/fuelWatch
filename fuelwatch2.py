@@ -1,6 +1,8 @@
 #import requests
 #r = requests.get('https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS')
 import feedparser
+import operator #.add
+from functools import reduce #reduce function
 #from datetime import datetime
 from pprint import pprint 
 #
@@ -61,7 +63,7 @@ def createfuelHTMLTABLE(data): # creates fuel table with columns Price, Location
 				{}
 				{}
 			</table>
-			'''.format(*argsT) #unpacking list argsT
+			'''.format(*argsT)
 	return tableF
 
 def writeTable(tableDat,fileName,): #writing function for table
@@ -73,10 +75,8 @@ def main():
 	Days = ['today','tomorrow']
 	Suburb = input('Choose suburb: ')
 	
-	fuelInfoToday = get_fuel(Suburb,Days[0])  #list of dictionaries with fuel info for today
-	fuelInfoTomorrow = get_fuel(Suburb,Days[1]) #list of dictionaries with fuel info for tomorrow
+	fuelInfo = reduce(operator.add, [get_fuel(Suburb,entry) for entry in Days]) # today and tomorrow's price using reduce and operator.add see packages
 	
-	fuelInfo = fuelInfoToday + fuelInfoTomorrow 
 	
 	#pprint(fuelInfo)
 	
