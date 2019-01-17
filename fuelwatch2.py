@@ -70,7 +70,7 @@ def writeTable(tableDat,fileName,): #writing function for table
 	with open(fileName,'w') as f:
 		f.write(tableDat)	
 
-def main():
+def run():
 	
 	Days = ['today','tomorrow']
 	Suburb = input('Choose suburb: ')
@@ -89,7 +89,9 @@ def main():
 	#writing full html string with fuel info to html file
 	writeTable(fuelTable,'fuelTodayandTomorrow.html')
 
-main() #executing main function nested with other defined functions
+print(__name__) #__name__ by default is main() from command prompt otherwise if importing it is name of file fuelwatch2.py
+if __name__ == '__main__':
+	run() #executing main function nested with other defined functions
 
 #feedback from Robin Chew:
 # use of **dic for unpacking arguments in dictionaries and *l for unpacking arguments in lists. e.g. minus(a,b) let d = {'a': 5, 'b':2} and l = [5, 2] then minus(**d) == minus(b=2,a=5) == minus(5,2) = minus(*l) etc etc
