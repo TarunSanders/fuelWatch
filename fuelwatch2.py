@@ -19,10 +19,10 @@ def getFuelWatchURL(suburbAndSurrounding,day,product):
 		exit('invalid fuel type chosen')
 	else:
 		url = url.format(prod = product_id, sub = suburbAndSurrounding, D = day) #.format is not mutable function/method
-	
+	print(url)
 	return url
 
-def get_fuel(suburbAndSurrounding,day, product = 1): #gets list of dictionaries with fuel info and returns this data in own dictionary with imp info
+def get_fuel(suburbAndSurrounding,day, product): #gets list of dictionaries with fuel info and returns this data in own dictionary with imp info
 	#product_id = 1 #1: unleaded
 	url = getFuelWatchURL(suburbAndSurrounding,day,product)
 	#print(url)
@@ -34,8 +34,9 @@ def get_fuel(suburbAndSurrounding,day, product = 1): #gets list of dictionaries 
 				'date': entry['updated'],
 				'address': entry['address'],
 				'day': day}
-			for entry in data['entries']
+			    for entry in data['entries']
 			]
+	
 	return(dataImp)
 
 def by_price(x): # function handle for sort mutable method or sorted non-mutable function to sort prices in list of dictionaries x
@@ -85,30 +86,25 @@ def writeTable(tableDat,fileName,): #writing function for table
 	with open(fileName,'w') as f:
 		f.write(tableDat)	
 
-def run(Suburb):
+def sortedFuel(Suburb,product=1):
 	
-	Days = ['today','tomorrow']
-	#Suburb = input('Choose suburb: ')
-	
-	fuelInfo = reduce(operator.add, [get_fuel(Suburb,entry,11) for entry in Days]) # today and tomorrow's price using reduce and operator.add see packages
-	
-	
-	#pprint(fuelInfo)
-	
-	#fuelInfoTomorrow.sort(key = by_price) 
-	fuelInfo.sort(key = by_price) #other option is to: fuelInfo = sorted(fuelInfo, key = by_price)
-	#pprint(fuelInfo,indent=4)
-	
+	sortedfuelInfo = sorted(getFuelTodayandTomorrow(Suburb,product), key = by_price)
 
-	fuelTable = createfuelHTMLTABLE(fuelInfo)
-	#writing full html string with fuel info to html file
-	writeTable(fuelTable,'fuelTable.html')
+	return sortedfuelInfo
+
+def getFuelTodayandTomorrow(Suburb,product):
+	Days = ['today','tomorrow']
+	fuelInfo = reduce(operator.add, [get_fuel(Suburb,entry,product) for entry in Days])
+	return fuelInfo
 
 #print(__name__) #__name__ by default is main() from command prompt otherwise if importing it is name of file fuelwatch2.py
 if __name__ == '__main__':
 	suburb = input('Choose suburb: ')
-	run(suburb) #executing main function nested with other defined functions
-
+	
+	data = sortedFuel(suburb) #executing main function nested with other defined functions
+	pprint(data)
+	fuelTable = createfuelHTMLTABLE(data)
+	writeTable(fuelTable,'fuelPrice.html')
 #feedback from Robin Chew:
 # use of **dic for unpacking arguments in dictionaries and *l for unpacking arguments in lists. e.g. minus(a,b) let d = {'a': 5, 'b':2} and l = [5, 2] then minus(**d) == minus(b=2,a=5) == minus(5,2) = minus(*l) etc etc
 # create own dictionary
