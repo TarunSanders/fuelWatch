@@ -6,10 +6,25 @@ from functools import reduce #reduce function
 #from datetime import datetime
 from pprint import pprint 
 #
-def get_fuel(suburbAndSurrounding,day): #gets list of dictionaries with fuel info and returns this data in own dictionary with imp info
-	product_id = 1; #1: unleaded
+
+def getFuelWatchURL(suburbAndSurrounding,day,product):
 	url = 'https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS?Product={prod}&Suburb={sub}&Day={D}' # product = ? query strings
-	url = url.format(prod = str(product_id), sub = suburbAndSurrounding, D = day) #.format is not mutable function/method
+	fuelChoiceEnc = {'1': '1',#unleaded
+				'2': '2', #premium unleaded
+				'3': '4', #'diesel'
+				'4': '5', #'LPG'
+				'5': '11',} #branded diesel
+	product_id = fuelChoiceEnc.get(str(product),'invalid')
+	if product_id == 'invalid':
+		exit('invalid fuel type chosen')
+	else:
+		url = url.format(prod = product_id, sub = suburbAndSurrounding, D = day) #.format is not mutable function/method
+	
+	return url
+
+def get_fuel(suburbAndSurrounding,day, product = 1): #gets list of dictionaries with fuel info and returns this data in own dictionary with imp info
+	#product_id = 1 #1: unleaded
+	url = getFuelWatchURL(suburbAndSurrounding,day,product)
 	#print(url)
 	data = feedparser.parse(url) #grabs RSS data from url and converts RSS to dictionary format if not already
 	
@@ -70,12 +85,12 @@ def writeTable(tableDat,fileName,): #writing function for table
 	with open(fileName,'w') as f:
 		f.write(tableDat)	
 
-def run():
+def run(Suburb):
 	
 	Days = ['today','tomorrow']
-	Suburb = input('Choose suburb: ')
+	#Suburb = input('Choose suburb: ')
 	
-	fuelInfo = reduce(operator.add, [get_fuel(Suburb,entry) for entry in Days]) # today and tomorrow's price using reduce and operator.add see packages
+	fuelInfo = reduce(operator.add, [get_fuel(Suburb,entry,11) for entry in Days]) # today and tomorrow's price using reduce and operator.add see packages
 	
 	
 	#pprint(fuelInfo)
@@ -87,11 +102,12 @@ def run():
 
 	fuelTable = createfuelHTMLTABLE(fuelInfo)
 	#writing full html string with fuel info to html file
-	writeTable(fuelTable,'fuelTodayandTomorrow.html')
+	writeTable(fuelTable,'fuelTable.html')
 
-print(__name__) #__name__ by default is main() from command prompt otherwise if importing it is name of file fuelwatch2.py
+#print(__name__) #__name__ by default is main() from command prompt otherwise if importing it is name of file fuelwatch2.py
 if __name__ == '__main__':
-	run() #executing main function nested with other defined functions
+	suburb = input('Choose suburb: ')
+	run(suburb) #executing main function nested with other defined functions
 
 #feedback from Robin Chew:
 # use of **dic for unpacking arguments in dictionaries and *l for unpacking arguments in lists. e.g. minus(a,b) let d = {'a': 5, 'b':2} and l = [5, 2] then minus(**d) == minus(b=2,a=5) == minus(5,2) = minus(*l) etc etc
