@@ -7,27 +7,36 @@ from functools import reduce #reduce function
 from pprint import pprint 
 #
 
+#note defaults to metro and all products for both days
 def getFuelWatchURL(suburbAndSurrounding,day,product):
-	url = 'https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS?Product={prod}&Suburb={sub}&Day={D}' # product = ? query strings
-	fuelChoiceEnc = {'1': '1',#unleaded
+
+	# product = ? query strings
+	fuelChoiceEnc = {
+				'1': '1',#unleaded
 				'2': '2', #premium unleaded
 				'3': '4', #'diesel'
 				'4': '5', #'LPG'
 				'5': '11',} #branded diesel
 	product_id = fuelChoiceEnc.get(str(product),'invalid')
-	if product_id == 'invalid':
-		exit('invalid fuel type chosen')
-	else:
-		url = url.format(prod = product_id, sub = suburbAndSurrounding, D = day) #.format is not mutable function/method
-	print(url)
-	return url
+	fuelFilterAttr = {"fueltype": product_id,
+					"Day": day,
+					"Suburb": suburbAndSurrounding,
+					}
+	URL = 'https://www.fuelwatch.wa.gov.au/fuelwatch/fuelWatchRSS?Day={Day}'
+	if product_id != 'invalid':
+		URL += '&Product={fueltype}'
+	if suburbAndSurrounding != 'metro':
+		URL += '&Suburb={Suburb}'
+	URL = URL.format(**fuelFilterAttr)
+	print(URL)
+	return URL
 
 def get_fuel(suburbAndSurrounding,day, product): #gets list of dictionaries with fuel info and returns this data in own dictionary with imp info
 	#product_id = 1 #1: unleaded
 	url = getFuelWatchURL(suburbAndSurrounding,day,product)
 	#print(url)
 	data = feedparser.parse(url) #grabs RSS data from url and converts RSS to dictionary format if not already
-	
+	#pprint(data)
 	dataImp = [ {'price': entry['price'], 
 				'location': entry['location'],
 				'brand':entry['brand'], 
@@ -86,33 +95,25 @@ def writeTable(tableDat,fileName,): #writing function for table
 	with open(fileName,'w') as f:
 		f.write(tableDat)	
 
-def sortedFuel(Suburb,product=1):
+def sortedFuel(SuburbandSurrounding='metro', product = 1): #defaults to unleaded
 	
-	sortedfuelInfo = sorted(getFuelTodayandTomorrow(Suburb,product), key = by_price)
+	sortedfuelInfo = sorted(getFuelTodayandTomorrow(SuburbandSurrounding,product), key = by_price)
 
 	return sortedfuelInfo
 
-def getFuelTodayandTomorrow(Suburb,product):
+def getFuelTodayandTomorrow(SuburbandSurrounding,product):
 	Days = ['today','tomorrow']
-	fuelInfo = reduce(operator.add, [get_fuel(Suburb,entry,product) for entry in Days])
+	fuelInfo = reduce(operator.add, [get_fuel(SuburbandSurrounding,entry,product) for entry in Days])
 	return fuelInfo
 
 #print(__name__) #__name__ by default is main() from command prompt otherwise if importing it is name of file fuelwatch2.py
 if __name__ == '__main__':
-	suburb = input('Choose suburb: ')
+	#suburb = input('Choose suburb: ')
 	
-	data = sortedFuel(suburb) #executing main function nested with other defined functions
-	pprint(data)
+	data = sortedFuel('cannington',2) #executing main function nested with other defined functions
+	#pprint(data)
 	fuelTable = createfuelHTMLTABLE(data)
 	writeTable(fuelTable,'fuelPrice.html')
 #feedback from Robin Chew:
 # use of **dic for unpacking arguments in dictionaries and *l for unpacking arguments in lists. e.g. minus(a,b) let d = {'a': 5, 'b':2} and l = [5, 2] then minus(**d) == minus(b=2,a=5) == minus(5,2) = minus(*l) etc etc
 # create own dictionary
-#
-#
-#
-#
-#
-#
-#
-#
